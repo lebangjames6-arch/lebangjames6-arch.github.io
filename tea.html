@@ -190,6 +190,15 @@ h2 .ln{display:block;margin-left:-.06em}
   .copy p{line-height:1.8}
   .counter span{display:none}
 }
+
+/* ---------- 修复：显隐状态优先于正文静止透明度 ---------- */
+/* .copy p 的 opacity:.84 与 .intro .lede 的 opacity:.76 会盖过 .rv 的隐藏态，
+   导致未激活的文案透出、与开场文字重叠；以下规则让隐藏态真正隐藏，
+   激活态保持原有观感（正文不透明、引言 .76）。 */
+p.rv{opacity:0}
+.intro .lede.rv{opacity:0}
+.on p.rv{opacity:1}
+#intro.on .lede.rv{opacity:.76}
 </style>
 </head>
 <body>
