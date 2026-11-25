@@ -672,5 +672,249 @@ fitAll();
 requestAnimationFrame(frame);
 })();
 </script>
+<!-- ===== 茶页音频模块（后加，独立自洽：Web Audio 程序合成，无外部文件） ===== -->
+<style id="tea-audio-css">
+#teaAudioBtn{position:fixed;right:14px;bottom:14px;z-index:60;width:46px;height:46px;border-radius:50%;
+ border:1px solid rgba(110,100,84,.5);background:rgba(18,18,16,.38);color:#eae4d3;cursor:pointer;
+ display:flex;align-items:center;justify-content:center;padding:0;
+ backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:.72;transition:opacity .3s,background .3s}
+#teaAudioBtn:hover{opacity:1}
+#teaAudioBtn.on{opacity:1;background:rgba(18,18,16,.58)}
+#teaAudioBtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+#teaAudioBtn .wv{display:none}
+#teaAudioBtn.on .wv{display:block}
+#teaAudioBtn.on .mx{display:none}
+@media (max-width:760px){#teaAudioBtn{right:12px;bottom:12px;width:42px;height:42px}}
+</style>
+<button id="teaAudioBtn" type="button" aria-label="开启或关闭声音" aria-pressed="false" title="声音">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path class="wv" d="M15.5 9.4a3.8 3.8 0 0 1 0 5.2"/><path class="wv" d="M18 6.9a7.2 7.2 0 0 1 0 10.2"/><line class="mx" x1="16" y1="9.6" x2="20.8" y2="14.4"/><line class="mx" x1="20.8" y1="9.6" x2="16" y2="14.4"/></svg>
+</button>
+<script>
+(function(){
+"use strict";
+var ACTS=[
+ {id:'mtn',el:'s-mtn'},
+ {id:'pick',el:'s-pick'},
+ {id:'wait',el:'s-wait'},
+ {id:'fry',el:'s-fry'},
+ {id:'roll',el:'s-roll'},
+ {id:'brew',el:'s-brew'},
+ {id:'end',el:'s-end'}
+];
+/* 每幕的声层目标值（0..1 的相对量，实际增益在各层内部定标） */
+var MIX={
+ mtn:{wind:1,birds:.5},
+ pick:{wind:.8,birds:1},
+ wait:{wind:.14,pad:.7},
+ fry:{sizzle:1,crackle:1,wind:.1},
+ roll:{swell:1,pad:.35},
+ brew:{water:1,bubbles:1,wind:.12},
+ end:{pad:1,wind:.1}
+};
+var LAYERS=['wind','sizzle','water','swell','pad'];
+var btn=document.getElementById('teaAudioBtn');
+var ctx=null,master=null,noiseBuf=null,layerGain={},schedulers=[];
+var enabled=false,curAct='intro',started=false;
+
+function $(id){return document.getElementById(id);}
+
+/* ---------- 当前幕判定：取视口中线所在的场景 ---------- */
+function detectAct(){
+ var mid=window.scrollY+window.innerHeight/2,found='mtn';
+ for(var i=0;i<ACTS.length;i++){
+   var el=$(ACTS[i].el); if(!el) continue;
+   var r=el.getBoundingClientRect(),top=r.top+window.scrollY;
+   if(mid>=top&&mid<top+r.height){found=ACTS[i].id;break;}
+   if(top<=mid) found=ACTS[i].id;
+ }
+ return found;
+}
+var ticking=false;
+function onScroll(){
+ if(ticking) return; ticking=true;
+ requestAnimationFrame(function(){
+   ticking=false;
+   var a=detectAct();
+   if(a!==curAct){var prev=curAct;curAct=a;if(enabled)applyAct(a,prev);}
+ });
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+window.addEventListener('resize',onScroll);
+curAct=detectAct();
+
+/* ---------- 合成基础 ---------- */
+function makeNoise(){
+ var len=ctx.sampleRate*2,buf=ctx.createBuffer(1,len,ctx.sampleRate),d=buf.getChannelData(0);
+ for(var i=0;i<len;i++) d[i]=Math.random()*2-1;
+ return buf;
+}
+function loopNoise(filterType,freq,q){
+ var src=ctx.createBufferSource(); src.buffer=noiseBuf; src.loop=true;
+ var f=ctx.createBiquadFilter(); f.type=filterType; f.frequency.value=freq; f.Q.value=q;
+ var g=ctx.createGain(); g.gain.value=0;
+ src.connect(f); f.connect(g); g.connect(master); src.start();
+ return {gain:g,filter:f};
+}
+function buildGraph(){
+ master=ctx.createGain(); master.gain.value=0; master.connect(ctx.destination);
+ noiseBuf=makeNoise();
+ var wind=loopNoise('bandpass',480,.5);
+ var lfo=ctx.createOscillator(); lfo.frequency.value=.06;
+ var lfoG=ctx.createGain(); lfoG.gain.value=140; lfo.connect(lfoG); lfoG.connect(wind.filter.frequency); lfo.start();
+ layerGain.wind=wind.gain; layerGain.windBase=.05;
+ var siz=loopNoise('highpass',3200,.7); layerGain.sizzle=siz.gain; layerGain.sizzleBase=.014;
+ var wat=loopNoise('bandpass',1150,1.6); layerGain.water=wat.gain; layerGain.waterBase=.022;
+ var swl=loopNoise('lowpass',260,.8);
+ var swlLfo=ctx.createOscillator(); swlLfo.frequency.value=.22;
+ var swlDepth=ctx.createGain(); swlDepth.gain.value=.5;
+ var swlBase=ctx.createConstantSource(); swlBase.offset.value=.5;
+ var swlMix=ctx.createGain(); swlMix.gain.value=0;
+ swlLfo.connect(swlDepth); swlDepth.connect(swlMix.gain); swlBase.connect(swlMix.gain);
+ swlLfo.start(); swlBase.start();
+ /* swell 的实际声量 = 层增益 × 呼吸混合 */
+ var swlOut=ctx.createGain(); swlOut.gain.value=0;
+ swl.gain.gain.value=1; swl.gain.disconnect(); swl.gain.connect(swlMix); swlMix.connect(swlOut); swlOut.connect(master);
+ layerGain.swell=swlOut; layerGain.swellBase=.05;
+ var padG=ctx.createGain(); padG.gain.value=0;
+ var padF=ctx.createBiquadFilter(); padF.type='lowpass'; padF.frequency.value=620;
+ [196,294.5,392.5].forEach(function(fr,i){
+   var o=ctx.createOscillator(); o.type='triangle'; o.frequency.value=fr; o.detune.value=(i-1)*4;
+   var og=ctx.createGain(); og.gain.value=i===2?.35:.6;
+   o.connect(og); og.connect(padF); o.start();
+ });
+ padF.connect(padG); padG.connect(master);
+ layerGain.pad=padG; layerGain.padBase=.016;
+}
+/* ---------- 一次性音效 ---------- */
+function chirp(){
+ if(!enabled) return;
+ var t=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain();
+ o.type='sine';
+ var f0=2300+Math.random()*700;
+ o.frequency.setValueAtTime(f0,t);
+ o.frequency.exponentialRampToValueAtTime(f0*1.35,t+.07);
+ o.frequency.exponentialRampToValueAtTime(f0*.92,t+.16);
+ g.gain.setValueAtTime(0,t);
+ g.gain.linearRampToValueAtTime(.055,t+.03);
+ g.gain.exponentialRampToValueAtTime(.0001,t+.2);
+ o.connect(g); g.connect(master); o.start(t); o.stop(t+.22);
+ if(Math.random()<.5) setTimeout(chirp,180+Math.random()*120);
+}
+function cracklePop(){
+ if(!enabled) return;
+ var t=ctx.currentTime,src=ctx.createBufferSource(); src.buffer=noiseBuf;
+ src.playbackRate.value=.8+Math.random()*.6;
+ var f=ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=1500+Math.random()*1400; f.Q.value=6;
+ var g=ctx.createGain();
+ g.gain.setValueAtTime(.05+Math.random()*.04,t);
+ g.gain.exponentialRampToValueAtTime(.0001,t+.03+Math.random()*.03);
+ src.connect(f); f.connect(g); g.connect(master);
+ src.start(t,Math.random()*1.5,.08);
+}
+function bubble(){
+ if(!enabled) return;
+ var t=ctx.currentTime,o=ctx.createOscillator(),g=ctx.createGain();
+ o.type='sine';
+ var f0=280+Math.random()*420;
+ o.frequency.setValueAtTime(f0,t);
+ o.frequency.exponentialRampToValueAtTime(f0*1.8,t+.09);
+ g.gain.setValueAtTime(0,t);
+ g.gain.linearRampToValueAtTime(.02,t+.02);
+ g.gain.exponentialRampToValueAtTime(.0001,t+.12);
+ o.connect(g); g.connect(master); o.start(t); o.stop(t+.14);
+}
+function pour(){
+ var t=ctx.currentTime,src=ctx.createBufferSource(); src.buffer=noiseBuf; src.loop=true;
+ var f=ctx.createBiquadFilter(); f.type='bandpass'; f.Q.value=1.1;
+ f.frequency.setValueAtTime(650,t);
+ f.frequency.linearRampToValueAtTime(1750,t+2.2);
+ f.frequency.linearRampToValueAtTime(1200,t+3);
+ var g=ctx.createGain();
+ g.gain.setValueAtTime(0,t);
+ g.gain.linearRampToValueAtTime(.05,t+.4);
+ g.gain.setValueAtTime(.05,t+2.4);
+ g.gain.linearRampToValueAtTime(0,t+3.1);
+ src.connect(f); f.connect(g); g.connect(master);
+ src.start(t); src.stop(t+3.2);
+}
+function clink(){
+ var t=ctx.currentTime;
+ [2093,3520].forEach(function(fr,i){
+   var o=ctx.createOscillator(),g=ctx.createGain();
+   o.type='sine'; o.frequency.value=fr;
+   g.gain.setValueAtTime(i? .018:.045,t);
+   g.gain.exponentialRampToValueAtTime(.0001,t+.8);
+   o.connect(g); g.connect(master); o.start(t); o.stop(t+.85);
+ });
+}
+/* ---------- 调度器：按当前幕随机触发 ---------- */
+function schedule(fn,min,max,flag){
+ var timer=null;
+ function loop(){
+   var mix=MIX[curAct]||{};
+   if(enabled&&mix[flag]) fn();
+   timer=setTimeout(loop,min+Math.random()*(max-min));
+ }
+ timer=setTimeout(loop,min);
+ schedulers.push(function(){clearTimeout(timer);});
+}
+function startSchedulers(){
+ schedule(chirp,2600,7000,'birds');
+ schedule(cracklePop,90,420,'crackle');
+ schedule(bubble,140,620,'bubbles');
+}
+/* ---------- 切幕：交叉淡化 + 入幕一次性音效 ---------- */
+function applyAct(a,prev){
+ var mix=MIX[a]||{},t=ctx.currentTime;
+ LAYERS.forEach(function(name){
+   var target=(mix[name]||0)*(layerGain[name+'Base']||0);
+   layerGain[name].gain.cancelScheduledValues(t);
+   layerGain[name].gain.setValueAtTime(layerGain[name].gain.value,t);
+   layerGain[name].gain.linearRampToValueAtTime(target,t+2.4);
+ });
+ if(a==='brew'&&prev!=='brew') pour();
+ if(a==='end'&&prev!=='end') setTimeout(clink,600);
+}
+/* ---------- 开关 ---------- */
+function setEnabled(on){
+ enabled=on;
+ btn.classList.toggle('on',on);
+ btn.setAttribute('aria-pressed',on?'true':'false');
+ if(on){
+   if(!ctx){
+     var AC=window.AudioContext||window.webkitAudioContext;
+     if(!AC){enabled=false;btn.classList.remove('on');return;}
+     ctx=new AC(); buildGraph(); startSchedulers(); started=true;
+   }
+   ctx.resume();
+   var t=ctx.currentTime;
+   master.gain.cancelScheduledValues(t);
+   master.gain.setValueAtTime(master.gain.value,t);
+   master.gain.linearRampToValueAtTime(.9,t+1.2);
+   /* 首次开启按当前幕直接铺声层（不触发入幕音效） */
+   var mix=MIX[curAct]||{};
+   LAYERS.forEach(function(name){
+     layerGain[name].gain.setValueAtTime((mix[name]||0)*(layerGain[name+'Base']||0),t);
+   });
+ }else if(ctx){
+   var t2=ctx.currentTime;
+   master.gain.cancelScheduledValues(t2);
+   master.gain.setValueAtTime(master.gain.value,t2);
+   master.gain.linearRampToValueAtTime(0,t2+.6);
+   setTimeout(function(){if(!enabled&&ctx)ctx.suspend();},700);
+ }
+}
+btn.addEventListener('click',function(){setEnabled(!enabled);});
+document.addEventListener('visibilitychange',function(){
+ if(!ctx) return;
+ if(document.hidden){ctx.suspend();}
+ else if(enabled){ctx.resume();}
+});
+window.__TEA_AUDIO={get enabled(){return enabled;},get act(){return curAct;},
+ get ctxState(){return ctx?ctx.state:'none';},toggle:function(){setEnabled(!enabled);}};
+})();
+</script>
+<!-- ===== 茶页音频模块结束 ===== -->
+
 </body>
 </html>
