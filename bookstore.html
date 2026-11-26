@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>山外书店 · 老街上最晚熄灯的地方</title>
+<meta name="description" content="山外书店，开在山脚下的老街上。旧书、新书、茶和咖啡，每天下午两点开门，营业到凌晨一点。">
+<meta name="theme-color" content="#1B1E25">
+<style nonce="HS7wMf0CbGXzjgh35dAXFQ==">
+/* 字体本地托管：按本页用字子集化（2026-11-26），不再走 Google Fonts CDN */
+@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/noto-serif-sc-400.woff2') format('woff2')}
+@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/noto-serif-sc-600.woff2') format('woff2')}
+@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:900;font-display:swap;src:url('fonts/noto-serif-sc-900.woff2') format('woff2')}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/ibm-plex-mono-400.woff2') format('woff2')}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/ibm-plex-mono-500.woff2') format('woff2')}
+:root{
+  --page-night:#101215;
+  --page-sky:#1B1E25;
+  --page-ridge:#16181E;
+  --page-wood:#23272F;
+  --page-lamp:#E8A33D;
+  --page-paper:#ECE4D2;
+  --page-dim:#A39C8B;
+  --page-ink:#2B2620;
+  --page-rule:rgba(236,228,210,.14);
+  --page-serif:'Noto Serif SC','Songti SC','STSong','SimSun',serif;
+  --page-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --page-grain:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .17 0 0 0 0 .15 0 0 0 0 .12 0 0 0 .12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--page-night);color:var(--page-paper);font-family:var(--page-serif);font-size:1rem;line-height:1.85;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--page-lamp);color:var(--page-night)}
+.wrap{max-width:1160px;margin:0 auto;padding:0 clamp(20px,5vw,48px)}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2.4vw,32px)}
+.grid>*{min-width:0}
+h2{font-weight:600;font-size:clamp(26px,3.2vw,38px);line-height:1.35;margin:0 0 18px;letter-spacing:.01em}
+.lead{margin:0;color:var(--page-dim);max-width:30em}
+
+/* ---------- 首屏 ---------- */
+.hero{--cord:clamp(90px,20vh,190px);--lx:62%;position:relative;min-height:100vh;min-height:100svh;background:var(--page-sky);overflow:hidden;display:flex;flex-direction:column}
+.top{position:relative;z-index:3;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px 16px;padding:20px 0;font-family:var(--page-mono);font-size:12px;color:var(--page-dim);letter-spacing:.04em}
+.light{position:absolute;inset:0;z-index:1;pointer-events:none;transition:opacity 1.2s ease}
+.cone{position:absolute;left:var(--lx);top:calc(var(--cord) + 40px);width:min(980px,150vw);height:110vh;transform:translateX(-50%);
+  background:linear-gradient(to bottom,rgba(232,163,61,.22),rgba(232,163,61,.06) 55%,rgba(232,163,61,0) 85%);
+  clip-path:polygon(47% 0,53% 0,100% 100%,0 100%)}
+.halo{position:absolute;left:var(--lx);top:calc(var(--cord) + 46px);width:280px;height:280px;transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(232,163,61,.42),rgba(232,163,61,0) 62%)}
+.lamp{position:absolute;z-index:2;top:0;left:var(--lx);width:84px;margin-left:-42px;pointer-events:none}
+.cord{display:block;width:1px;height:var(--cord);margin:0 auto;background:var(--page-dim);opacity:.5}
+.shade{display:block;width:84px;height:42px;background:var(--page-wood);clip-path:polygon(30% 0,70% 0,100% 100%,0 100%);box-shadow:inset 0 -3px 0 var(--page-lamp)}
+.bulb{display:block;width:20px;height:10px;margin:0 auto;border-radius:0 0 10px 10px;background:var(--page-paper);transition:background 1.2s}
+.is-closed .light{opacity:.3}
+.is-closed .bulb{background:var(--page-dim)}
+
+.hero-body{position:relative;z-index:3;flex:1;padding-bottom:clamp(130px,17vw,230px)}
+.name{grid-column:9/13;grid-row:1;justify-self:end;align-self:start;margin:clamp(8px,3vh,40px) 0 0;
+  writing-mode:vertical-rl;font-weight:900;font-size:clamp(60px,min(14vw,15vh),146px);line-height:1;letter-spacing:.1em;color:var(--page-paper)}
+.copy{grid-column:1/8;grid-row:1;align-self:end}
+.tag{margin:0;font-weight:600;font-size:clamp(32px,4.8vw,58px);line-height:1.3;letter-spacing:.02em}
+.sub{max-width:28em;margin:20px 0 0;color:var(--page-dim);font-size:clamp(15px,1.4vw,17px)}
+.hours{margin:32px 0 0;display:grid;grid-template-columns:auto minmax(0,1fr);max-width:470px;border-top:1px solid var(--page-rule)}
+.hours dt,.hours dd{margin:0;padding:11px 0;border-bottom:1px solid var(--page-rule)}
+.hours dt{color:var(--page-dim);font-size:13px;padding-right:28px}
+.hours dd{font-family:var(--page-mono);font-size:14px;text-align:right}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--page-dim);margin-right:8px;vertical-align:1px}
+.is-open .dot{background:var(--page-lamp);box-shadow:0 0 10px var(--page-lamp)}
+.ridge{position:absolute;z-index:2;left:0;bottom:-1px;width:100%;height:clamp(110px,16vw,230px);display:block}
+
+/* ---------- 今夜推荐 ---------- */
+.section{padding:clamp(72px,10vw,128px) 0}
+.date{font-family:var(--page-mono);font-size:12px;color:var(--page-lamp);margin:0 0 14px;letter-spacing:.04em}
+.books-head{grid-column:1/5}
+.shelf{grid-column:6/13;list-style:none;margin:0;padding:0}
+.book{display:grid;grid-template-columns:60px minmax(0,1fr);column-gap:clamp(18px,3vw,36px);align-items:end;padding-top:40px;border-bottom:1px solid var(--page-dim)}
+.book:first-child{padding-top:8px}
+.spine{writing-mode:vertical-rl;width:56px;height:var(--h);display:flex;justify-content:space-between;align-items:center;padding:16px 0 14px;
+  font-weight:600;font-size:15px;letter-spacing:.16em;line-height:1;transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.spine small{font-size:11px;font-weight:400;letter-spacing:.1em;opacity:.9}
+.s1{--h:212px;background:var(--page-lamp);color:var(--page-night)}
+.s2{--h:176px;background:var(--page-grain),var(--page-paper);color:var(--page-ink)}
+.s3{--h:236px;background:var(--page-wood);color:var(--page-paper);box-shadow:inset 0 0 0 1px rgba(236,228,210,.14)}
+.book:focus-within .spine{transform:translateY(-14px)}
+.info{padding-bottom:26px}
+.info h3{margin:0;font-size:clamp(20px,2vw,24px);font-weight:600;line-height:1.4}
+.by{margin:2px 0 10px;color:var(--page-dim);font-size:14px}
+.why{margin:0;max-width:32em}
+.where{margin:12px 0 0;font-family:var(--page-mono);font-size:12px;color:var(--page-lamp)}
+
+/* ---------- 茶饮单 ---------- */
+.tea{border-top:1px solid var(--page-rule)}
+.tea-copy{grid-column:1/6;align-self:center}
+.cat-note{margin:28px 0 0;padding-left:16px;border-left:2px solid var(--page-lamp);color:var(--page-paper);max-width:26em}
+.slip-wrap{grid-column:7/13;padding-top:70px}
+.slip{position:relative;max-width:460px;margin-left:auto;background:var(--page-grain),var(--page-paper);color:var(--page-ink);
+  padding:40px clamp(22px,4vw,42px) 28px;transform:rotate(-1.2deg)}
+.slip::after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:8px;
+  background:radial-gradient(circle at 6px 0,var(--page-paper) 6px,transparent 6.5px) 0 0/12px 8px repeat-x}
+.slip-title{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--page-ink);padding-bottom:10px}
+.slip-title h3{margin:0;font-size:22px;font-weight:900;letter-spacing:.2em}
+.slip-title span{font-family:var(--page-mono);font-size:11px;opacity:.8}
+.menu{list-style:none;margin:8px 0 0;padding:0}
+.menu li{display:flex;align-items:baseline;gap:10px;padding:11px 6px;margin:0 -6px;transition:background .2s ease}
+.menu .n{font-size:16px}
+.menu .n small{display:block;font-size:12px;line-height:1.5;opacity:.8}
+.menu .fill{flex:1;min-width:16px;border-bottom:1px dotted rgba(43,38,32,.45);transform:translateY(-5px)}
+.menu .p{font-family:var(--page-mono);font-size:15px;font-weight:500}
+.slip-foot{margin:14px 0 0;padding-top:12px;border-top:1px dashed rgba(43,38,32,.4);font-family:var(--page-mono);font-size:11px;line-height:1.8;opacity:.7}
+.cat{position:absolute;right:30px;top:-71px;width:150px;height:auto;overflow:visible}
+
+/* ---------- 留言墙 ---------- */
+.wall{border-top:1px solid var(--page-rule)}
+.wall-head{grid-column:1/8}
+.notes{grid-column:1/-1;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(16px,2.4vw,32px);align-items:start;margin:60px 0 0;padding:0;list-style:none}
+.notes>*{min-width:0}
+.note{position:relative;background:var(--page-grain),var(--page-paper);color:var(--page-ink);padding:32px 26px 22px;transform:rotate(var(--r));
+  transition:transform .3s ease-out,opacity .6s ease-out}
+.note::before{content:"";position:absolute;top:-11px;left:50%;width:78px;height:22px;margin-left:-39px;background:rgba(236,228,210,.42);transform:rotate(var(--t,-3deg))}
+.note:nth-child(1){grid-column:1/5;--r:-2deg}
+.note:nth-child(2){grid-column:5/9;--r:1.4deg;--t:4deg;margin-top:70px;background:var(--page-grain),#E9D3A8;background:var(--page-grain),color-mix(in srgb,var(--page-lamp) 32%,var(--page-paper))}
+.note:nth-child(3){grid-column:9/13;--r:-.8deg;margin-top:22px}
+.note p{margin:0;font-size:16px;line-height:1.95}
+.note .sig{margin-top:16px;font-size:13px;opacity:.8;text-align:right}
+.note.wait{opacity:0;transform:rotate(var(--r)) translateY(28px)}
+@media (hover:hover){
+  .book:hover .spine{transform:translateY(-14px)}
+  .menu li:hover{background:rgba(232,163,61,.22)}
+  .note:hover{transform:rotate(0deg) translateY(-6px)}
+}
+
+/* ---------- 页脚 ---------- */
+.foot{border-top:1px solid var(--page-rule);padding:clamp(72px,9vw,120px) 0 36px}
+.bye{grid-column:1/8;margin:0;font-weight:900;font-size:clamp(34px,5.2vw,64px);line-height:1.28;letter-spacing:.02em}
+.bye span{display:block;margin-top:14px;font-weight:400;font-size:clamp(16px,1.6vw,19px);color:var(--page-dim);letter-spacing:0;line-height:1.7}
+.foot-info{grid-column:9/13;align-self:end;margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);border-top:1px solid var(--page-rule)}
+.foot-info dt,.foot-info dd{margin:0;padding:12px 0;border-bottom:1px solid var(--page-rule)}
+.foot-info dt{color:var(--page-dim);font-size:13px;padding-right:24px}
+.foot-info dd{font-size:15px}
+.foot-info .mono{font-family:var(--page-mono);font-size:14px}
+.fine{grid-column:1/-1;margin-top:72px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px 24px;font-family:var(--page-mono);font-size:11px;color:var(--page-dim)}
+
+/* ---------- 动效 ---------- */
+@media (prefers-reduced-motion:no-preference){
+  .cone,.halo{animation:lampOn 1.8s .35s ease-out both}
+  @keyframes lampOn{0%{opacity:0}9%{opacity:.75}13%{opacity:.08}22%{opacity:.9}28%{opacity:.35}42%,100%{opacity:1}}
+  .town-light{animation:breathe 4s ease-in-out infinite}
+  @keyframes breathe{0%,100%{opacity:.25}50%{opacity:.6}}
+  .cat-body{transform-box:fill-box;transform-origin:50% 100%;animation:sleep 4.6s ease-in-out infinite}
+  @keyframes sleep{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.04)}}
+  .cat-tail{transform-box:fill-box;transform-origin:100% 0;animation:tail 7s ease-in-out infinite}
+  @keyframes tail{0%,80%,100%{transform:rotate(0)}88%{transform:rotate(-4deg)}}
+}
+@media (prefers-reduced-motion:reduce){
+  .spine,.note,.menu li{transition:none}
+}
+
+/* ---------- 手机 ---------- */
+@media (max-width:760px){
+  .hero{--lx:24%;--cord:clamp(70px,12vh,120px)}
+  .name{grid-column:1/-1;justify-self:end;margin-top:4px}
+  .copy{grid-column:1/-1;grid-row:2;margin-top:36px}
+  .hours{max-width:none}
+  .books-head,.shelf,.tea-copy,.slip-wrap,.wall-head,.bye,.foot-info{grid-column:1/-1}
+  .shelf{margin-top:36px}
+  .book{grid-template-columns:46px minmax(0,1fr)}
+  .spine{width:44px;font-size:13px}
+  .slip-wrap{padding-top:96px}
+  .slip{margin:0 auto}
+  .cat{width:130px;top:-61px;right:20px}
+  .notes{margin-top:44px}
+  .note:nth-child(n){grid-column:1/-1;margin-top:34px}
+  .note:nth-child(1){margin-top:0;margin-right:7%}
+  .note:nth-child(2){margin-left:7%}
+  .note:nth-child(3){margin-right:4%}
+  .foot-info{margin-top:44px}
+  .fine{margin-top:52px}
+}
+</style>
+</head>
+<body>
+
+<header class="hero" id="hero">
+  <div class="light" aria-hidden="true"><div class="cone"></div><div class="halo"></div></div>
+  <div class="lamp" aria-hidden="true"><span class="cord"></span><span class="shade"></span><span class="bulb"></span></div>
+
+  <div class="wrap" style="width: 100%;">
+    <div class="top"><span>山外书店</span><span>青溪镇老街 47 号</span></div>
+  </div>
+
+  <div class="wrap hero-body grid" style="width: 100%;">
+    <h1 class="name">山外书店</h1>
+    <div class="copy">
+      <p class="tag">天黑以后，<br>这里还亮着。</p>
+      <p class="sub">山脚下的老街上，一家卖旧书、新书，也卖茶和咖啡的小店。整条街关灯以后，我们还开着。</p>
+      <dl class="hours">
+        <dt>营业</dt><dd>每天 14:00 – 次日 01:00</dd>
+        <dt>此刻</dt><dd id="status"><span class="dot"></span>每天下午两点开门</dd>
+      </dl>
+    </div>
+  </div>
+
+  <svg class="ridge" viewBox="0 0 1440 220" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <path fill="#16181E" d="M0,120 L140,84 L250,110 L380,46 L520,104 L640,72 L770,118 L900,30 L1040,98 L1170,70 L1300,112 L1440,64 V220 H0Z"></path>
+    <path fill="#101215" d="M0,178 L160,150 L300,168 L470,132 L620,170 L780,146 L930,176 L1090,138 L1250,166 L1440,150 V220 H0Z"></path>
+    <g fill="#272B33">
+      <rect x="650" y="196" width="5" height="5"></rect><rect x="700" y="199" width="5" height="5"></rect>
+      <rect x="742" y="194" width="5" height="5"></rect><rect x="826" y="198" width="5" height="5"></rect>
+      <rect x="872" y="195" width="5" height="5"></rect>
+    </g>
+    <circle class="town-light" cx="786" cy="197" r="14" fill="#E8A33D" opacity=".35"></circle>
+    <rect x="783.5" y="194.5" width="5" height="5" fill="#E8A33D"></rect>
+  </svg>
+</header>
+
+<main>
+  <section class="section wrap grid" aria-labelledby="t-books">
+    <div class="books-head">
+      <p class="date" id="tonight">今夜推荐</p>
+      <h2 id="t-books">今夜推荐：三本适合读到很晚的书</h2>
+      <p class="lead">店主每晚换一次。都放在进门左手边第二层书架，旧书区那本只有一册，先到先得。</p>
+    </div>
+    <ul class="shelf">
+      <li class="book">
+        <div class="spine s1" aria-hidden="true"><span>夜晚的潜水艇</span><small>陈春成</small></div>
+        <div class="info">
+          <h3>《夜晚的潜水艇》</h3>
+          <p class="by">陈春成 著</p>
+          <p class="why">九个短篇，每一篇都像深夜里推开一扇不该推开的门。读完一篇，停下来喝口茶，再读下一篇。</p>
+          <p class="where">新书区</p>
+        </div>
+      </li>
+      <li class="book">
+        <div class="spine s2" aria-hidden="true"><span>我与地坛</span><small>史铁生</small></div>
+        <div class="info">
+          <h3>《我与地坛》</h3>
+          <p class="by">史铁生 著</p>
+          <p class="why">适合一个人读到很晚。合上书会想出门走一走，好在一点以前，老街都很安静。</p>
+          <p class="where">旧书区 · 仅此一册，扉页有上一位主人的铅笔批注</p>
+        </div>
+      </li>
+      <li class="book">
+        <div class="spine s3" aria-hidden="true"><span>雪国</span><small>川端康成</small></div>
+        <div class="info">
+          <h3>《雪国》</h3>
+          <p class="by">川端康成 著</p>
+          <p class="why">开头那条长长的隧道，最好在冬天的夜里穿过去。窗外越冷，书里的灯越亮。</p>
+          <p class="where">新书区</p>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <section class="section tea" aria-labelledby="t-tea">
+    <div class="wrap grid">
+      <div class="tea-copy">
+        <h2 id="t-tea">点一杯茶，就可以坐到打烊</h2>
+        <p class="lead">没有最低消费，也不计时。热水随时续。晚上十一点以后咖啡机要休息，只做热茶和热可可。</p>
+        <p class="cat-note">收银台上那只黑猫叫煤球，四岁，白天晚上都在睡。结账的时候它要是压着收款码，轻轻挪一下它的尾巴就行，它不会醒。</p>
+      </div>
+      <div class="slip-wrap">
+        <div class="slip">
+          <svg class="cat" viewBox="0 0 160 80" role="img" aria-label="一只在收银台上睡觉的黑猫">
+            <g class="cat-body" fill="#101215">
+              <ellipse cx="94" cy="56" rx="52" ry="22"></ellipse>
+              <circle cx="46" cy="52" r="19"></circle>
+              <path d="M30,42 L32,21 L45,34Z"></path>
+              <path d="M49,33 L61,20 L63,42Z"></path>
+            </g>
+            <path class="cat-tail" d="M142,64 C158,74 142,82 118,80 C96,78 78,80 58,76" fill="none" stroke="#101215" stroke-width="9" stroke-linecap="round"></path>
+            <path d="M36,53 q4,3 8,0 M50,53 q4,3 8,0" fill="none" stroke="#ECE4D2" stroke-width="1.6" stroke-linecap="round"></path>
+          </svg>
+          <div class="slip-title"><h3>茶饮单</h3><span>单位：元</span></div>
+          <ul class="menu">
+            <li><span class="n">老街红茶<small>一壶，可续三次</small></span><span class="fill"></span><span class="p">22</span></li>
+            <li><span class="n">桂花乌龙<small>店主秋天自己窨的桂花</small></span><span class="fill"></span><span class="p">26</span></li>
+            <li><span class="n">手冲咖啡<small>今日豆写在柜台小黑板上</small></span><span class="fill"></span><span class="p">32</span></li>
+            <li><span class="n">燕麦拿铁</span><span class="fill"></span><span class="p">28</span></li>
+            <li><span class="n">热可可<small>附一块姜糖</small></span><span class="fill"></span><span class="p">24</span></li>
+          </ul>
+          <p class="slip-foot">续热水 免费<br>23:00 以后只供应热饮</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wall" aria-labelledby="t-wall">
+    <div class="wrap grid">
+      <div class="wall-head">
+        <h2 id="t-wall">收银台旁边的软木板上，客人留下的话</h2>
+        <p class="lead">每到月底取下来，收进一个铁皮饼干盒里。下面是这个月的。</p>
+      </div>
+      <ul class="notes">
+        <li class="note">
+          <p>第三次来了，煤球还是不理我。下次带罐头来，看你理不理。</p>
+          <p class="sig">住在坡上的小周 · 11月2日</p>
+        </li>
+        <li class="note">
+          <p>加班到十一点半，走到这条街，发现只有你们家还亮着。一壶红茶，看了四十页，心里慢慢松下来了。谢谢老板没赶我走。</p>
+          <p class="sig">一个路过的人 · 11月9日</p>
+        </li>
+        <li class="note">
+          <p>在旧书区那本《边城》里翻到一张 1998 年的电影票，夹在第 87 页。不知道是谁的，我放回去了。如果是你的，它还在那儿。</p>
+          <p class="sig">L · 11月19日</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap grid">
+    <p class="bye">下山的路黑，<br>走慢一点。<span>我们明天下午两点见。</span></p>
+    <dl class="foot-info">
+      <dt>地址</dt><dd>青溪镇老街 47 号<br><span style="color: var(--page-dim); font-size: 13px;">山脚公交站下车，沿石阶往上走两百米，看到亮灯的那家就是</span></dd>
+      <dt>营业</dt><dd class="mono">每天 14:00 – 次日 01:00</dd>
+      <dt>休息</dt><dd>除夕当天</dd>
+    </dl>
+    <div class="fine"><span>© 山外书店</span><span>旧书收购请白天来，晚上店主要看书</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // 按北京时间计算营业状态
+  var now = new Date(Date.now() + 8 * 3600e3);
+  var mins = now.getUTCHours() * 60 + now.getUTCMinutes();
+  var OPEN = 14 * 60, CLOSE = 60;
+  var isOpen = mins >= OPEN || mins < CLOSE;
+  var hero = document.getElementById('hero');
+  var el = document.getElementById('status');
+  function span(m){ var h = Math.floor(m / 60), r = m % 60; return (h ? h + ' 小时 ' : '') + r + ' 分'; }
+  if (isOpen) {
+    var left = mins >= OPEN ? (1440 - mins + CLOSE) : (CLOSE - mins);
+    el.innerHTML = '<span class="dot"></span>营业中，还有 ' + span(left) + '打烊';
+    hero.classList.add('is-open');
+  } else {
+    el.innerHTML = '<span class="dot"></span>休息中，下午两点开门';
+    hero.classList.add('is-closed');
+  }
+
+  // 今夜日期
+  var d = isOpen && mins < CLOSE ? new Date(now.getTime() - 86400e3) : now;
+  document.getElementById('tonight').textContent =
+    (d.getUTCMonth() + 1) + '月' + d.getUTCDate() + '日 · 星期' + '日一二三四五六'.charAt(d.getUTCDay());
+
+  // 留言条滚动到眼前时，一张张贴上去
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce && 'IntersectionObserver' in window) {
+    var notes = document.querySelectorAll('.note');
+    notes.forEach(function(n){ n.classList.add('wait'); });
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (!e.isIntersecting) return;
+        var i = Array.prototype.indexOf.call(notes, e.target);
+        e.target.style.transitionDelay = (i * 0.12) + 's';
+        e.target.classList.remove('wait');
+        setTimeout(function(){ e.target.style.transitionDelay = ''; }, 900);
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.25 });
+    notes.forEach(function(n){ io.observe(n); });
+  }
+})();
+</script>
+
+
+</body></html>
